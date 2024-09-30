@@ -1,59 +1,74 @@
 let turn = true
-let btnClicked = 0
+let btnClicked = 0;
+let playAgainstComputer = false;
 let btns = document.querySelectorAll(".btn")
 btns.forEach(b=>{
     b.addEventListener("click" , btnClick)
 })
 
+
+startGame();
+
+function startGame() {
+    swal({
+        title: "האם תרצה לשחק מול המחשב?",
+        buttons: {
+            yes: "כן",
+            no: "לא"
+        }
+    }).then((value) => {
+        if (value === "yes") {
+            playAgainstComputer = true;
+        } else {
+            playAgainstComputer = false;
+        }
+    });
+}
+
+
+
 function btnClick() {
-    if (this.textContent !=""){
-      
-     
-  swal(  "! משבצת מלאה", " נסה שוב במקום אחר", "שגיאה");
-       
-      
-     return}
-     btnClicked ++
-     if(turn) this.textContent = "X" 
-     else this.textContent = "0"
+    if (this.textContent != "") {
+        swal("משבצת מלאה!", "נסה שוב במקום אחר", "error");
+        return;
+    }
+    btnClicked++;
+    this.textContent = turn ? "X" : "0";
 
-     let obj = chickWin()
-     if(obj.win){
-        let btns = document.querySelectorAll(".btn")
-        btns [obj.pos[0]] .style .color = "red" 
-        btns [obj.pos[1]] .style .color = "red" 
-        btns [obj.pos[2]] .style .color = "red"
-
-
-       
-
-        setTimeout(() =>{
-            swal("!!ניצח    "+ this.textContent  ,"  לחץ על הכפתור 'המשך' כדי להמשיך למשחק חדש", {
-                button: "המשך"
-              });
-              
-              //"    ' ניצח!! למשחק חדש לחץ 'אישור" + this.textContent)
-        reset()
-    } , 100 ) 
-
-    }else if (obj.isTie){
-    setTimeout(() =>{
-        alert ( " is A Tia")
-        reset()
-    } , 100 ) 
+    let obj = chickWin();
+    if (obj.win) {
+        highlightWin(obj.pos);
+        setTimeout(() => {
+            swal("ניצח " + this.textContent, "לחץ על 'המשך' כדי לשחק שוב", { button: "המשך" }).then(() => {
+                reset(); 
+                startGame(); 
+            });}, 100);
+        startGame();
+    } else if (obj.isTie) {
+        setTimeout(() => {
+            swal("תיקו!", "לחץ על 'המשך' כדי לשחק שוב", { button: "המשך" }).then(() => {
+                reset(); 
+                startGame(); 
+            });}, 100);
+    }
+    else if(playAgainstComputer){
+        setTimeout(computerMove, 500);
+    }
+    
+        turn = !turn;   
+    
 }
-    turn = !turn
-}
+
 
 function reset() {
-     let btns = document.querySelectorAll(".btn")
-     true == !true
-     btnClicked = 0
-     btns.forEach(b =>{
-     b.textContent = ""
-     b.style.color = ""
-    })
-} 
+    btnClicked = 0;
+    btns.forEach(b => {
+        b.textContent = "";
+        b.style.color = "";
+    });
+    turn = true;
+}
+
 
 function chickWin() {
     let btns = document.querySelectorAll (".btn")
@@ -82,6 +97,140 @@ function chickWin() {
     return obj
 
 }
+
+function highlightWin(pos) {
+    pos.forEach(i => btns[i].style.color = "red");
+}
+
+function computerMove() {
+    let emptyCells = [];
+    btns.forEach((btn, index) => {
+        if (btn.textContent === "") {
+            emptyCells.push(index);
+        }
+    });
+
+    if (emptyCells.length > 0) {
+        let randomIndex = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+        btns[randomIndex].textContent = "0";
+        btnClicked++;
+
+        let obj = chickWin();
+        if (obj.win) {
+            debugger
+            highlightWin(obj.pos);
+            setTimeout(() => {
+                swal("המחשב ניצח!", "לחץ על 'המשך' כדי לשחק שוב", { button: "המשך" }).then(() => {
+                    reset(); 
+                    startGame(); 
+                });}, 100);
+        } else if (btnClicked === 9) {
+            setTimeout(() => {
+                swal("תיקו!", "לחץ על 'המשך' כדי לשחק שוב", { button: "המשך" }).then(() => {
+                    reset(); 
+                    startGame(); 
+                });}, 100); 
+        }
+        turn = !turn;
+    }
+}
+
+
+// let turn = true
+// let btnClicked = 0
+// let btns = document.querySelectorAll(".btn")
+// btns.forEach(b=>{
+//     b.addEventListener("click" , btnClick)
+// })
+
+// function btnClick() {
+//     if (this.textContent !=""){
+      
+     
+//   swal(  "! משבצת מלאה", " נסה שוב במקום אחר", "שגיאה");
+       
+      
+//      return}
+//      btnClicked ++
+//      if(turn) this.textContent = "X" 
+//      else this.textContent = "0"
+
+//      let obj = chickWin()
+//      if(obj.win){
+//         let btns = document.querySelectorAll(".btn")
+//         btns [obj.pos[0]] .style .color = "red" 
+//         btns [obj.pos[1]] .style .color = "red" 
+//         btns [obj.pos[2]] .style .color = "red"
+
+
+       
+
+//         setTimeout(() =>{
+//             swal("!!ניצח    "+ this.textContent  ,"  לחץ על הכפתור 'המשך' כדי להמשיך למשחק חדש", {
+//                 button: "המשך"
+//               });
+              
+//               //"    ' ניצח!! למשחק חדש לחץ 'אישור" + this.textContent)
+//         reset()
+//     } , 100 ) 
+
+//     }else if (obj.isTie){
+//     setTimeout(() =>{
+//         alert ( " is A Tia")
+//         reset()
+//     } , 100 ) 
+// }
+//     turn = !turn
+// }
+
+// function reset() {
+//      let btns = document.querySelectorAll(".btn")
+//      true == !true
+//      btnClicked = 0
+//      btns.forEach(b =>{
+//      b.textContent = ""
+//      b.style.color = ""
+//     })
+// } 
+
+function chickWin() {
+    let btns = document.querySelectorAll (".btn")
+    let obj = {win:false , isTie:false , pos:[]}
+
+    if(btns[0].textContent == btns[1].textContent && btns[1].textContent == btns[2].textContent && btns[2].textContent  != "")
+    obj = {win:true , isTie:false , pos:[0 , 1 , 2]}
+    else if(btns[3].textContent == btns[4].textContent && btns[4].textContent == btns[5].textContent && btns[5].textContent  != "")
+    obj =  {win:true , isTie:false , pos:[3 , 4 , 5]}
+    else if(btns[6].textContent == btns[7].textContent && btns[7].textContent == btns[8].textContent && btns[8].textContent  != "")
+    obj =  {win:true , isTie:false , pos:[6 , 7 , 8]}
+    else if(btns[0].textContent == btns[3].textContent && btns[3].textContent == btns[6].textContent && btns[6].textContent  != "")
+    obj =  {win:true , isTie:false , pos:[0 , 3 , 6]}
+    else if(btns[1].textContent == btns[4].textContent && btns[4].textContent == btns[7].textContent && btns[7].textContent  != "")
+     obj = {win:true , isTie:false , pos:[1 , 4 , 7]}
+    else if(btns[2].textContent == btns[5].textContent && btns[5].textContent == btns[8].textContent && btns[8].textContent  != "")
+    obj =  {win:true , isTie:false , pos:[2, 5 , 8]} 
+    else if(btns[0].textContent == btns[4].textContent && btns[4].textContent == btns[8].textContent && btns[8].textContent  != "")
+    obj =  {win:true , isTie:false , pos:[0 , 4 , 8]} 
+    else if(btns[2].textContent == btns[4].textContent && btns[4].textContent == btns[6].textContent && btns[6].textContent  != "")
+    obj =  {win:true , isTie:false , pos:[2 , 4 , 6]}
+    else if(btnClicked == 9)
+    obj.isTie = true
+   // obj =  {win:false , isTie:false , pos:[]}
+
+    return obj
+
+}
+
+
+
+
+
+
+
+
+
+
+
 
 // function computerTurn(board) {
 //     // חפש שלוש נקודות עוקבות באותו צבע
